@@ -1,2 +1,3 @@
 /tmp
 /movies.sqlite
+*_templ.go
