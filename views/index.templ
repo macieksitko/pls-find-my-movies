@@ -1,0 +1,228 @@
+package views
+
+templ Index() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>pls find my... 🕵🙏</title>
+			<link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png"/>
+			<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+			<style>
+				body {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+					min-height: 100vh;
+					margin: 0;
+					font-family: Arial, sans-serif;
+					font-size: 1.2rem;
+				}
+                .container {
+                    text-align: center;
+                    width: 100%;
+                    max-width: 800px;
+                    padding: 10px;
+                    position: relative;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    min-height: 100vh;
+                    justify-content: center;
+                    transition: padding-top 0.3s ease-out;
+                }
+                .container #title-emoji {
+                    margin: 13px 0 25px;
+                    font-size: 2.5rem;
+                }
+                .container #title-text {
+                    margin: 0;
+                }
+                #header {
+                    margin-top: 20px;
+                    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+                }
+                .search-container {
+                    position: relative;
+                    width: 90%;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    transition: margin-bottom 0.3s ease-out, transform 0.3s ease-out;
+                }
+				h1 {
+					font-size: 2.5rem;
+				}
+                input[type="search"] {
+                    font-size: 1.5rem;
+                    padding: 12px 20px;
+                    padding-left: 50px;
+                    width: 100%;
+                    border-radius: 25px;
+                    border: 1px solid #ddd;
+                    outline: none;
+                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                    transition: border-radius 0.05s ease;
+                    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23999" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>');
+                    background-repeat: no-repeat;
+                    background-position: 15px center;
+                    background-size: 20px;
+                }
+                input[type="search"]::-webkit-search-cancel-button,
+                input[type="search"]::-webkit-search-decoration,
+                input[type="search"]::-webkit-search-results-button,
+                input[type="search"]::-webkit-search-results-decoration {
+                    -webkit-appearance: none;
+                    appearance: none;
+                }
+                #search-results:not(:empty) {
+                    display: block;
+                    border-top: 1px solid #ddd;
+                }
+				button {
+					font-size: 1.2rem;
+					padding: 8px 16px;
+				}
+				.htmx-indicator {
+                    opacity: 0;
+                    transition: opacity 200ms ease-in;
+                    position: absolute;
+                    top: 50%;
+                    right: 10px;
+                    transform: translateY(-50%);
+                }
+				.htmx-request .htmx-indicator {
+					opacity: 1;
+				}
+				.htmx-request.htmx-indicator {
+					opacity: 1;
+				}
+                #search-results {
+                    position: absolute;
+                    left: 0;
+                    right: 0;
+                    background-color: white;
+                    border: 1px solid #ddd;
+                    border-top: none;
+                    border-radius: 0 0 25px 25px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    max-height: 300px;
+                    overflow-y: auto;
+                    z-index: 1000;
+                    display: none;
+                }
+                .search-result-item {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-start;
+                    padding: 10px 16px;
+                    cursor: pointer;
+                }
+                .search-result-item:hover {
+                    background-color: #f0f0f0;
+                }
+                .movie-title {
+                    font-weight: bold;
+                }
+                .movie-description {
+                    font-size: 0.9em;
+                    color: #666;
+                }
+                .blur {
+                    filter: blur(4px);
+                    transition: filter 0.3s ease-in-out;
+                }
+                #streamings-results {
+                    width: 100%;
+                    max-width: 800px;
+                    margin-top: 20px;
+                }
+                #streamings-results-container {
+                    position: relative;
+                    width: 100%;
+                    max-width: 800px;
+                    margin-top: 20px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 200px;
+                }
+                #streamings-spinner {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                }
+			</style>
+		</head>
+		<body>
+			<div class="container">
+				<div id="header">
+					<h1 id="title-text">pls find my...</h1>
+					<h1 id="title-emoji">🕵🙏</h1>
+				</div>
+				<div class="search-container">
+					<input
+						id="search-input"
+						type="search"
+						name="q"
+						placeholder="Search movies..."
+						hx-get="/search"
+						hx-trigger="input changed delay:500ms, search"
+						hx-target="#search-results"
+						hx-indicator="#spinner"
+					/>
+					<img id="spinner" class="htmx-indicator" width="40" src="/static/img/bars.svg" alt="Loading..."/>
+					<div id="search-results"></div>
+				</div>
+				<div id="streamings-results-container">
+					<div id="streamings-results"></div>
+					<img id="streamings-spinner" class="htmx-indicator" width="40" src="/static/img/bars.svg" alt="Loading..."/>
+				</div>
+			</div>
+			<script>
+                function moveSearchToTop() {
+                    const container = document.querySelector('.container');
+                    const header = document.getElementById('header');
+                    const searchContainer = document.querySelector('.search-container');
+
+                    container.style.justifyContent = 'flex-start';
+                    container.style.paddingTop = '20px';
+                }
+
+                document.body.addEventListener('htmx:beforeRequest', function(event) {
+                    hideSearchResults();
+                });
+
+                document.body.addEventListener('htmx:afterRequest', function(event) {
+                    const searchInput = document.getElementById('search-input');
+                    const searchResults = document.getElementById('search-results');
+
+                    if (event.detail.elt.id === 'search-input') {
+                        const resultsWrapper = searchResults.querySelector('.results-wrapper');
+                        
+                        if (resultsWrapper && resultsWrapper.children.length > 0) {
+                            searchInput.style.borderBottomLeftRadius = '0';
+                            searchInput.style.borderBottomRightRadius = '0';
+                            searchResults.style.display = 'block';
+                        } else {
+                            hideSearchResults();
+                        }
+                    } else if (event.detail.elt.getAttribute('hx-get')?.startsWith('/streamings/')) {
+                        hideSearchResults();
+                        moveSearchToTop();
+                        document.getElementById('streamings-results-container').scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+                function hideSearchResults() {
+                    const searchInput = document.getElementById('search-input');
+                    const searchResults = document.getElementById('search-results');
+                    
+                    searchInput.style.borderBottomLeftRadius = '25px';
+                    searchInput.style.borderBottomRightRadius = '25px';
+                    searchResults.style.display = 'none';
+                }
+        </script>
+		</body>
+	</html>
+}

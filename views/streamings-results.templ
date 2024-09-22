@@ -1,0 +1,70 @@
+package views
+
+import "pls-find-my/models"
+
+templ StreamingResults(streamings []models.MovieStreaming) {
+	<div class="streaming-results-wrapper">
+		if len(streamings) > 0 {
+			<h2>Available Streaming Services</h2>
+			<ul class="streaming-list">
+				for _, streaming := range streamings {
+					<li class="streaming-item">
+						<span class="streaming-service">{ streaming.Streaming.Service }</span>
+						<a href="{ streaming.MovieURL }" class="streaming-link">Watch Now</a>
+					</li>
+				}
+			</ul>
+		} else {
+			<p class="no-streaming">No streaming services available for this movie.</p>
+		}
+	</div>
+	<style>
+		.streaming-results-wrapper {
+			max-width: 100%;
+			box-sizing: border-box;
+			width: 100%;
+			background-color: #f5f5f5;
+			border-radius: 8px;
+			padding: 20px;
+			margin-top: 20px;
+		}
+		.streaming-title {
+			color: #333;
+			font-size: 1.5em;
+			margin-bottom: 15px;
+		}
+		.streaming-list {
+			list-style-type: none;
+			padding: 0;
+		}
+		.streaming-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			background-color: #fff;
+			border-radius: 4px;
+			padding: 10px 15px;
+			margin-bottom: 10px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
+		.streaming-service {
+			font-weight: bold;
+			color: #444;
+		}
+		.streaming-link {
+			background-color: #007bff;
+			color: #fff;
+			text-decoration: none;
+			padding: 5px 10px;
+			border-radius: 25px;
+			transition: background-color 0.3s ease;
+		}
+		.streaming-link:hover {
+			background-color: #0056b3;
+		}
+		.no-streaming {
+			color: #666;
+			font-style: italic;
+		}
+	</style>
+}

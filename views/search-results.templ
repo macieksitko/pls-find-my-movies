@@ -1,0 +1,25 @@
+package views
+
+import (
+	"pls-find-my/models"
+	"strconv"
+)
+
+templ SearchResults(results []models.Movie) {
+	<div class="results-wrapper">
+		for _, movie := range results {
+			<div
+				class="search-result-item"
+				hx-get={ "/streamings/" + strconv.Itoa(movie.ID) }
+				hx-target="#streamings-results"
+				hx-indicator="#streamings-spinner"
+				hx-trigger="click"
+			>
+				<div class="movie-title">{ movie.Title }</div>
+				if movie.Description != "" {
+					<div class="movie-description">{ movie.Description }</div>
+				}
+			</div>
+		}
+	</div>
+}
